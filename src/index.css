@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #141414;
+  --color-ink: #E4E3E0;
+  --color-accent: #CAFD02; /* Gym neon green */
+  --font-mono: "JetBrains Mono", "Courier New", monospace;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  /* Safe area padding for iOS */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Adjust sticky header for iOS safe areas */
+header {
+  padding-top: env(safe-area-inset-top);
+}

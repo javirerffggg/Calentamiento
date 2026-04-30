@@ -1,0 +1,24 @@
+{
+  "name": "GymWarmup Protocol",
+  "short_name": "GymWarmup",
+  "description": "Guía de calentamiento dinámico y activación articular.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#141414",
+  "theme_color": "#CAFD02",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn.jsdelivr.net/gh/lucide-icons/lucide@latest/icons/dumbbell.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn.jsdelivr.net/gh/lucide-icons/lucide@latest/icons/dumbbell.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
