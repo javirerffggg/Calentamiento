@@ -126,5 +126,70 @@ export const ROUTINES: DayRoutine[] = [
         restBetweenSets: "90s"
       }
     ]
+  },
+  {
+    id: RoutineType.UPPER,
+    days: "Días de Upper",
+    title: "Torso (Combinado)",
+    sections: [
+      {
+        title: "1. Movilidad Articular",
+        exercises: [
+          { name: "Círculos de cuello y muñecas", duration: 30, notes: "Movimientos lentos." },
+          { name: "Círculos de hombros (Molinos)", reps: "10 adelante / 10 atrás", notes: "Lubricar la articulación." },
+          { name: "Rotaciones de Tronco con Brazos Relajados", reps: "15-20 giros", notes: "Activar la columna torácica." },
+          { name: "Rotaciones Externas 'en L'", reps: "12-15 reps", notes: "Proteger el manguito rotador." }
+        ]
+      },
+      {
+        title: "2. Activación Escapular",
+        exercises: [
+          { name: "Círculos Escapulares", reps: "10 reps", notes: "Lentas: arriba, atrás, abajo, adelante." },
+          { name: "Plancha", duration: 45, notes: "Activar el core." }
+        ],
+        restBetweenSets: "45s"
+      },
+      {
+        title: "3. Series de Aproximación",
+        exercises: [
+          { name: "Serie 1: 30% del peso real", reps: "15 reps", tempo: "3:1:1:0", weightPercent: 30, notes: "Primer multiarticular del día." },
+          { name: "Serie 2: 60% del peso real", reps: "8 reps", tempo: "3:1:1:0", weightPercent: 60, notes: "Primer multiarticular del día." }
+        ]
+      }
+    ]
+  },
+  {
+    id: RoutineType.LOWER_ALT,
+    days: "Días de Lower",
+    title: "Pierna (Refuerzo Lumbar)",
+    initialActivity: {
+      name: "Elevación de Temperatura",
+      duration: "5 min",
+      notes: "Bicicleta o Elíptica (ritmo suave)."
+    },
+    sections: [
+      {
+        title: "1. Movilidad Articular",
+        exercises: [
+          { name: "Balanceos de Pierna", reps: "15 front / 15 lat", notes: "Por cada pierna." },
+          { name: "Sentadilla Cossack", reps: "10 reps", notes: "Abrir cadera y estirar aductores." },
+          { name: "Plancha Lateral", duration: 30, notes: "Por cada lado." }
+        ]
+      },
+      {
+        title: "2. Activación Lumbar/Glúteo",
+        exercises: [
+          { name: "Puente de glúteo + Superman alterno", reps: "15 reps", notes: "Fija pelvis y protege lumbar." }
+        ],
+        restBetweenSets: "30s"
+      },
+      {
+        title: "3. Series de Aproximación",
+        exercises: [
+          { name: "Serie 1: Máquina vacía / 30%", reps: "15 reps", tempo: "3:1:1:0", weightPercent: 30, notes: "En tu ejercicio principal." },
+          { name: "Serie 2: 50-60% del peso real", reps: "8 reps", tempo: "3:1:1:0", weightPercent: 55, notes: "En tu ejercicio principal." }
+        ]
+      }
+    ]
   }
 ];

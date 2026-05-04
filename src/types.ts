@@ -1,7 +1,9 @@
 export enum RoutineType {
   PUSH = 'Empuje',
   PULL = 'Tirón',
-  LEGS = 'Pierna'
+  LEGS = 'Pierna',
+  UPPER = 'Torso',
+  LOWER_ALT = 'Lower'
 }
 
 export interface Exercise {

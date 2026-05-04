@@ -130,6 +130,27 @@ export default function App() {
   const lastScrollY = useRef(0);
 
   useEffect(() => {
+    // Auto-select routine based on day of week if not already set or it's a new day
+    const day = new Date().getDay(); // 0 (Sun) to 6 (Sat)
+    let suggestedRoutine: RoutineType | null = null;
+    
+    if (day === 1 || day === 4) suggestedRoutine = RoutineType.PUSH;
+    else if (day === 2 || day === 5) suggestedRoutine = RoutineType.PULL;
+    else if (day === 3 || day === 6) suggestedRoutine = RoutineType.LEGS;
+
+    // We only auto-change if they haven't completed anything today yet 
+    // and if the routine is different (this is just a nice-to-have)
+    if (suggestedRoutine && completedExercises.length === 0 && activeRoutineId !== suggestedRoutine) {
+      const lastSuggestionDate = localStorage.getItem('warmup_last_suggestion_date');
+      const today = new Date().toDateString();
+      if (lastSuggestionDate !== today) {
+        setActiveRoutineId(suggestedRoutine);
+        localStorage.setItem('warmup_last_suggestion_date', today);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
@@ -209,7 +230,10 @@ export default function App() {
                         : "text-white/40 hover:text-white"
                     )}
                   >
-                    {r.id === RoutineType.PUSH ? 'Push' : r.id === RoutineType.PULL ? 'Pull' : 'Legs'}
+                    {r.id === RoutineType.PUSH ? 'Push' : 
+                     r.id === RoutineType.PULL ? 'Pull' : 
+                     r.id === RoutineType.LEGS ? 'Legs' :
+                     r.id === RoutineType.UPPER ? 'Upper' : 'Lower'}
                   </button>
                 ))}
               </div>
