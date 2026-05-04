@@ -126,6 +126,23 @@ export default function App() {
   const [workingWeight, setWorkingWeight] = useLocalStorage<number>('warmup_working_weight', 60);
   const [completedExercises, setCompletedExercises] = useLocalStorage<string[]>('warmup_completed_exercises', []);
   const [showRest, setShowRest] = useState<number | null>(null);
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+        setHeaderVisible(false);
+      } else {
+        setHeaderVisible(true);
+      }
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const activeRoutine = useMemo(() => 
     ROUTINES.find(r => r.id === activeRoutineId) || ROUTINES[0]
@@ -161,19 +178,23 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <header className="border-b border-white/10 sticky top-0 bg-[#141414]/80 backdrop-blur-md z-40">
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2 text-accent mb-2">
-                <Dumbbell className="w-6 h-6" />
-                <span className="text-[10px] uppercase tracking-[0.2em] font-mono font-bold">Protocolo Elite</span>
+      <motion.header 
+        initial={{ y: 0 }}
+        animate={{ y: headerVisible ? 0 : -150 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="border-b border-white/10 fixed top-0 w-full bg-[#141414]/90 backdrop-blur-xl z-40"
+      >
+        <div className="max-w-4xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="bg-accent/10 p-2 rounded-lg text-accent">
+                <Dumbbell className="w-5 h-5" />
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight italic serif">ACTIVACIÓN</h1>
+              <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none">WARMUP</h1>
             </div>
             
-            <div className="flex flex-col gap-4">
-              <div className="flex gap-1 bg-black/50 p-1 rounded-xl border border-white/5 self-end">
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1 bg-black/50 p-1 rounded-lg border border-white/5">
                 {ROUTINES.map((r) => (
                   <button
                     key={r.id}
@@ -182,10 +203,10 @@ export default function App() {
                       setCompletedExercises([]);
                     }}
                     className={cn(
-                      "px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300",
+                      "px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all",
                       activeRoutineId === r.id 
-                        ? "bg-accent text-black shadow-[0_0_15px_rgba(202,253,2,0.3)]" 
-                        : "text-white/40 hover:text-white hover:bg-white/5"
+                        ? "bg-accent text-black" 
+                        : "text-white/40 hover:text-white"
                     )}
                   >
                     {r.id === RoutineType.PUSH ? 'Push' : r.id === RoutineType.PULL ? 'Pull' : 'Legs'}
@@ -193,73 +214,70 @@ export default function App() {
                 ))}
               </div>
               
-              <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-2 self-end">
-                <span className="text-[10px] uppercase font-bold text-white/30 font-mono">Peso Trabajo</span>
+              <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5">
                 <input 
                   type="number" 
                   value={workingWeight}
                   onChange={(e) => setWorkingWeight(Number(e.target.value))}
-                  className="bg-transparent border-none text-accent font-mono font-bold text-lg w-16 focus:ring-0 text-right p-0"
+                  className="bg-transparent border-none text-accent font-mono font-bold text-sm w-10 focus:ring-0 text-right p-0"
                 />
-                <span className="text-white/30 font-mono text-sm leading-none">kg</span>
+                <span className="text-white/30 font-mono text-[10px] uppercase">kg</span>
               </div>
             </div>
           </div>
         </div>
-      </header>
+      </motion.header>
 
-      <main className="max-w-4xl mx-auto px-6 py-12">
+      <main className="max-w-4xl mx-auto px-4 pt-24 pb-12">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeRoutine.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            <div className="mb-12 border-l-4 border-accent pl-6 flex justify-between items-start">
-              <div>
-                <span className="text-accent/60 font-mono text-sm tracking-wider uppercase">{activeRoutine.days}</span>
-                <h2 className="text-4xl font-black mt-1 italic tracking-tight">{activeRoutine.title}</h2>
+            <div className="mb-8 flex justify-between items-end">
+              <div className="border-l-2 border-accent pl-4">
+                <span className="text-accent/60 font-mono text-[10px] tracking-[0.2em] uppercase">{activeRoutine.days}</span>
+                <h2 className="text-2x font-black italic tracking-tight">{activeRoutine.title}</h2>
               </div>
               <button 
                 onClick={resetRoutine}
-                className="p-3 rounded-full hover:bg-white/5 text-white/20 hover:text-accent transition-colors"
-                title="Resetear progreso"
+                className="p-2 text-white/20 hover:text-accent transition-colors"
+                title="Resetear"
               >
-                <RotateCcw className="w-5 h-5" />
+                <RotateCcw className="w-4 h-4" />
               </button>
             </div>
 
             {activeRoutine.initialActivity && (
-              <div className="mb-12">
-                <div className="flex items-center gap-4 bg-accent text-black p-6 rounded-3xl shadow-[0_10px_30px_rgba(202,253,2,0.15)]">
-                  <div className="bg-black/20 p-4 rounded-2xl">
-                    <Zap className="w-8 h-8" />
+              <div className="mb-8">
+                <div className="flex items-center gap-4 bg-accent text-black p-4 rounded-2xl shadow-lg shadow-accent/5">
+                  <div className="bg-black/10 p-2 rounded-xl">
+                    <Zap className="w-5 h-5" />
                   </div>
                   <div className="flex-1">
-                    <div className="flex justify-between items-center mb-1">
-                      <h3 className="font-black text-xl italic uppercase font-mono tracking-tighter">{activeRoutine.initialActivity.name}</h3>
-                      <span className="bg-black/10 px-3 py-1 rounded-full text-xs font-bold font-mono">{activeRoutine.initialActivity.duration}</span>
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-black text-sm uppercase font-mono tracking-tighter">{activeRoutine.initialActivity.name}</h3>
+                      <span className="text-[10px] font-bold font-mono opacity-60">{activeRoutine.initialActivity.duration}</span>
                     </div>
-                    <p className="text-black/60 font-medium">{activeRoutine.initialActivity.notes}</p>
+                    <p className="text-[11px] font-medium leading-tight opacity-70">{activeRoutine.initialActivity.notes}</p>
                   </div>
                 </div>
               </div>
             )}
 
-            <div className="space-y-16">
+            <div className="space-y-10">
               {activeRoutine.sections.map((section, idx) => (
                 <section key={idx}>
-                  <div className="flex items-center gap-4 mb-8">
-                    <div className="h-px flex-1 bg-white/10" />
-                    <h3 className="text-[10px] uppercase tracking-[0.4em] font-mono font-black text-white/20 bg-[#141414] px-6 whitespace-nowrap">
+                  <div className="flex items-center gap-3 mb-4">
+                    <h3 className="text-[9px] uppercase tracking-[0.3em] font-black text-white/20 whitespace-nowrap">
                       {section.title}
                     </h3>
-                    <div className="h-px flex-1 bg-white/10" />
+                    <div className="h-px flex-1 bg-white/5" />
                   </div>
 
-                  <div className="grid gap-4">
+                  <div className="grid gap-2">
                     {section.exercises.map((ex, exIdx) => {
                       const isDone = completedExercises.includes(ex.name);
                       const calculatedWeight = ex.weightPercent ? Math.round(workingWeight * (ex.weightPercent / 100)) : null;
@@ -268,57 +286,54 @@ export default function App() {
                         <div 
                           key={exIdx}
                           className={cn(
-                            "group relative overflow-hidden bg-[#1E1E1E] border border-white/10 rounded-[2rem] p-8 transition-all duration-500",
-                            isDone ? "opacity-30 translate-x-2 grayscale border-transparent" : "hover:border-accent/40 hover:bg-[#252525] shadow-xl hover:shadow-accent/5",
-                            !isDone && "hover:-translate-y-1"
+                            "relative overflow-hidden bg-[#1E1E1E] border border-white/5 rounded-xl p-4 transition-all duration-300",
+                            isDone ? "opacity-25 grayscale scale-[0.98]" : "hover:border-accent/20 hover:bg-[#252525]"
                           )}
                         >
-                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-                            <div className="flex items-start gap-6">
-                              <button 
-                                onClick={() => toggleComplete(ex.name, section.restBetweenSets)}
-                                className={cn(
-                                  "mt-1.5 flex-shrink-0 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300",
-                                  isDone 
-                                    ? "bg-accent border-accent text-black scale-110" 
-                                    : "border-white/10 text-transparent hover:border-accent group-hover:text-accent/30"
-                                )}
-                              >
-                                <CheckCircle2 className="w-6 h-6" />
-                              </button>
+                          <div className="flex gap-4">
+                            <button 
+                              onClick={() => toggleComplete(ex.name, section.restBetweenSets)}
+                              className={cn(
+                                "flex-shrink-0 w-8 h-8 rounded-full border flex items-center justify-center transition-all",
+                                isDone 
+                                  ? "bg-accent border-accent text-black" 
+                                  : "border-white/10 text-transparent hover:border-accent/40"
+                              )}
+                            >
+                              <CheckCircle2 className="w-5 h-5" />
+                            </button>
+
+                            <div className="flex-1 min-w-0 space-y-1">
+                              <h4 className="text-sm font-black tracking-tight uppercase italic leading-tight">
+                                {ex.name}
+                              </h4>
                               
-                              <div className="flex-1">
-                                <h4 className="text-2xl font-black mb-2 flex flex-wrap items-center gap-3 tracking-tight italic uppercase">
-                                  {ex.name}
-                                  {ex.tempo && (
-                                    <span className="text-[9px] font-mono font-bold bg-white/5 text-white/40 px-2 py-1 rounded-sm tracking-widest border border-white/10">
-                                      T {ex.tempo}
-                                    </span>
-                                  )}
-                                  {calculatedWeight !== null && (
-                                    <span className="text-lg font-mono text-accent animate-in zoom-in duration-500">
-                                      → {calculatedWeight}kg
-                                    </span>
-                                  )}
-                                </h4>
-                                <p className="text-white/40 text-sm font-medium max-w-lg">{ex.notes}</p>
-                                {ex.instruction && (
-                                  <div className="mt-4 flex items-center gap-2 text-[10px] text-accent/60 font-mono border-t border-white/5 pt-3 uppercase tracking-wider">
-                                    <Info className="w-3.5 h-3.5" /> {ex.instruction}
-                                  </div>
+                              <p className="text-[10px] text-white/40 leading-relaxed">
+                                {ex.notes}
+                              </p>
+
+                              <div className="flex flex-wrap items-center gap-2 pt-1">
+                                {ex.reps && (
+                                  <span className="font-mono font-bold text-xs text-accent">
+                                    {ex.reps}
+                                  </span>
+                                )}
+                                {calculatedWeight !== null && (
+                                  <span className="text-accent font-mono text-xs font-bold">
+                                    ({calculatedWeight}kg)
+                                  </span>
+                                )}
+                                {ex.tempo && (
+                                  <span className="text-[8px] font-mono font-bold bg-white/5 text-white/30 px-1.5 py-0.5 rounded border border-white/5">
+                                    {ex.tempo}
+                                  </span>
                                 )}
                               </div>
                             </div>
 
-                            <div className="flex items-center gap-4 self-end md:self-center">
-                              {ex.reps && (
-                                <div className="bg-black px-6 py-3 rounded-2xl border border-white/5 text-center min-w-[80px]">
-                                  <span className="text-[9px] uppercase tracking-[0.2em] font-black text-white/20 block mb-1">Carga</span>
-                                  <span className="font-mono font-black text-xl text-accent">{ex.reps}</span>
-                                </div>
-                              )}
+                            <div className="flex-shrink-0 self-center">
                               {ex.duration && (
-                                <Timer duration={ex.duration} label="GO" onComplete={() => {}} />
+                                <Timer duration={ex.duration} onComplete={() => {}} />
                               )}
                             </div>
                           </div>
