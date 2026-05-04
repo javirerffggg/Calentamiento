@@ -7,14 +7,17 @@ import {
   RotateCcw, 
   CheckCircle2, 
   Info,
+  HelpCircle,
   Wind,
   Layers,
   Zap,
   Coffee,
-  X
+  X,
+  BookOpen
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ROUTINES } from './constants/workouts';
+import { TECHNICAL_GUIDE, PROTOCOL_INTRO, APPROXIMATION_GUIDE, RULES_OF_GOLD } from './constants/guide';
 import { RoutineType, DayRoutine } from './types';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -121,11 +124,138 @@ const RestOverlay = ({ duration, onFinish }: { duration: number, onFinish: () =>
   );
 };
 
+const GuideModal = ({ title, content, onClose }: { title: string, content: string, onClose: () => void }) => {
+  return (
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto"
+      onClick={onClose}
+    >
+      <motion.div 
+        initial={{ y: 20, scale: 0.95 }}
+        animate={{ y: 0, scale: 1 }}
+        exit={{ y: 20, scale: 0.95 }}
+        className="bg-[#1e1e1e] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
+          <h3 className="text-accent font-black italic uppercase tracking-wider">{title}</h3>
+          <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
+          {content.split('\n\n').map((paragraph, i) => (
+            <p key={i} className="text-white/70 leading-relaxed text-sm">
+              {paragraph.split(':').map((part, idx, arr) => (
+                <span key={idx}>
+                  {idx === 0 && arr.length > 1 ? (
+                    <strong className="text-white uppercase text-[10px] tracking-widest block mb-1 opacity-40">{part}:</strong>
+                  ) : part}
+                </span>
+              ))}
+            </p>
+          ))}
+        </div>
+        <div className="p-4 bg-accent/5 border-t border-white/5">
+          <button 
+            onClick={onClose}
+            className="w-full py-3 bg-accent text-black font-black uppercase text-xs tracking-widest rounded-xl"
+          >
+            ENTENDIDO
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+const FullGuideModal = ({ onClose }: { onClose: () => void }) => {
+  return (
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 overflow-y-auto"
+      onClick={onClose}
+    >
+      <motion.div 
+        initial={{ y: 30 }}
+        animate={{ y: 0 }}
+        exit={{ y: 30 }}
+        className="bg-[#141414] border border-white/10 rounded-3xl w-full max-w-2xl shadow-2xl h-[90vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/5 shrink-0">
+          <div className="flex items-center gap-3 text-accent">
+            <BookOpen className="w-6 h-6" />
+            <h3 className="font-black italic uppercase tracking-[0.1em]">Guía Técnica Integral</h3>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-8 space-y-12">
+          <div className="space-y-4">
+            <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white/40">Introducción</h4>
+            <p className="text-white/60 leading-relaxed italic">{PROTOCOL_INTRO}</p>
+          </div>
+
+          <div className="space-y-8">
+            <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white/40">Fases de Preparación</h4>
+            <div className="grid gap-6">
+              {Object.values(TECHNICAL_GUIDE).map((guide, i) => (
+                <div key={i} className="bg-white/5 p-6 rounded-2xl border border-white/5">
+                  <h5 className="text-accent font-black uppercase text-sm mb-4 leading-none italic">{guide.title}</h5>
+                  <div className="space-y-4 text-xs text-white/50 leading-relaxed">
+                    {guide.content.split('\n\n').map((p, j) => (
+                      <p key={j}>{p}</p>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white/40">Carga y Progresión</h4>
+            <p className="text-white/60 text-sm whitespace-pre-wrap">{APPROXIMATION_GUIDE}</p>
+          </div>
+
+          <div className="space-y-4">
+            <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white/40">Reglas de Oro</h4>
+            <div className="grid gap-3">
+              {RULES_OF_GOLD.map((rule, i) => (
+                <div key={i} className="flex gap-4 items-start p-4 rounded-xl bg-accent/5 border border-accent/10">
+                  <div className="w-5 h-5 rounded-full bg-accent text-black flex items-center justify-center text-[10px] font-black shrink-0">{i+1}</div>
+                  <p className="text-xs font-bold">{rule}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="p-6 border-t border-white/10 shrink-0">
+          <button 
+            onClick={onClose}
+            className="w-full py-4 bg-accent text-black font-black uppercase text-sm tracking-[0.2em] rounded-2xl"
+          >
+            Cerrar Guía
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
 export default function App() {
   const [activeRoutineId, setActiveRoutineId] = useLocalStorage<RoutineType>('warmup_active_routine', RoutineType.PUSH);
   const [workingWeight, setWorkingWeight] = useLocalStorage<number>('warmup_working_weight', 60);
   const [completedExercises, setCompletedExercises] = useLocalStorage<string[]>('warmup_completed_exercises', []);
   const [showRest, setShowRest] = useState<number | null>(null);
+  const [selectedGuide, setSelectedGuide] = useState<{ title: string, content: string } | null>(null);
+  const [showFullGuide, setShowFullGuide] = useState(false);
   const [headerVisible, setHeaderVisible] = useState(true);
   const lastScrollY = useRef(0);
 
@@ -197,6 +327,16 @@ export default function App() {
         {showRest && (
           <RestOverlay duration={showRest} onFinish={() => setShowRest(null)} />
         )}
+        {selectedGuide && (
+          <GuideModal 
+            title={selectedGuide.title} 
+            content={selectedGuide.content} 
+            onClose={() => setSelectedGuide(null)} 
+          />
+        )}
+        {showFullGuide && (
+          <FullGuideModal onClose={() => setShowFullGuide(false)} />
+        )}
       </AnimatePresence>
 
       <motion.header 
@@ -215,6 +355,13 @@ export default function App() {
             </div>
             
             <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setShowFullGuide(true)}
+                className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider text-white/40 hover:text-accent transition-colors"
+              >
+                <BookOpen className="w-4 h-4" />
+                Guía
+              </button>
               <div className="flex gap-1 bg-black/50 p-1 rounded-lg border border-white/5">
                 {ROUTINES.map((r) => (
                   <button
@@ -327,12 +474,26 @@ export default function App() {
                               <CheckCircle2 className="w-5 h-5" />
                             </button>
 
-                            <div className="flex-1 min-w-0 space-y-1">
-                              <h4 className="text-sm font-black tracking-tight uppercase italic leading-tight">
-                                {ex.name}
-                              </h4>
-                              
-                              <p className="text-[10px] text-white/40 leading-relaxed">
+                              <div className="flex-1 min-w-0 space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <h4 className="text-sm font-black tracking-tight uppercase italic leading-tight">
+                                    {ex.name}
+                                  </h4>
+                                  {TECHNICAL_GUIDE[ex.name] && (
+                                    <button 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedGuide(TECHNICAL_GUIDE[ex.name]);
+                                      }}
+                                      className="p-1 text-white/20 hover:text-accent transition-colors"
+                                      title="Ver técnica"
+                                    >
+                                      <HelpCircle className="w-3.5 h-3.5" />
+                                    </button>
+                                  )}
+                                </div>
+                                
+                                <p className="text-[10px] text-white/40 leading-relaxed">
                                 {ex.notes}
                               </p>
 
